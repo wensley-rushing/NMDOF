@@ -4,7 +4,7 @@ from math import pi
 from typing import Literal
 
 import numpy as np
-import opensees.openseespy as ops
+import xara
 
 
 def run_OS_py(
@@ -71,7 +71,7 @@ def run_OS_py(
         mode_num = 5
 
 
-    model = ops.Model(ndm=2, ndf=3)
+    model = xara.Model(ndm=2, ndf=3)
 
     # node
     model.node(1, 0, 0)  # base node
@@ -162,8 +162,9 @@ def run_OS_py(
     # recorder
     if not os.path.exists(f'{path}/temp_NLMDOF_results'):
         os.makedirs(f'{path}/temp_NLMDOF_results')
+    
     # 1 base node
-    model.recorder('Node', '-file', f'{path}/temp_NLMDOF_results/{gm_name}_base_reaction.txt', '-time', '-node', 1, '-dof', 1, 'reaction')
+    model.recorder('Node', 'reaction', '-file', f'{path}/temp_NLMDOF_results/{gm_name}_base_reaction.txt', '-time', '-node', 1, '-dof', 1)
     model.recorder('Node', '-file', f'{path}/temp_NLMDOF_results/{gm_name}_base_acc.txt', '-node', static_node, '-dof', 1, 'accel')
     model.recorder('Node', '-file', f'{path}/temp_NLMDOF_results/{gm_name}_base_vel.txt', '-node', static_node, '-dof', 1, 'vel')
     model.recorder('Node', '-file', f'{path}/temp_NLMDOF_results/{gm_name}_base_disp.txt', '-node', static_node, '-dof', 1, 'disp')
@@ -176,7 +177,7 @@ def run_OS_py(
     model.recorder('Element', '-file', f'{path}/temp_NLMDOF_results/{gm_name}_material.txt', '-ele', *all_element_tags, 'material', 1, 'stressStrain')
     # 4 modal results
     for i in range(1, mode_num + 1):
-        model.recorder('Node', '-file', f'{path}/temp_NLMDOF_results/mode_{i}.txt', '-node', *floor_nodes, '-dof', 1, f'eigen {i}')
+        model.recorder('Node', '-file', f'{path}/temp_NLMDOF_results/mode_{i}.txt', '-node', *floor_nodes, '-dof', 1, f'{{eigen {i}}}')
 
     # Time history analysis
     if setting[6]:
